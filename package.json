@@ -32,6 +32,6 @@
     "@types/amqplib": "^0.5.13",
     "amqplib": "^0.6.0",
     "emvicify": "git+https://github.com/lcnvdl/emvicify.git",
-    "node-essential": "0.0.21"
+    "node-essential": "0.0.22"
   }
 }
