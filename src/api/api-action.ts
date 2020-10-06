@@ -1,0 +1,4 @@
+export class ApiAction {
+    name = "";
+}
+

@@ -2,8 +2,10 @@
   "name": "backzzle",
   "version": "0.0.1",
   "description": "Backzzle",
-  "main": "index.js",
+  "types": "lib",
+  "main": "lib/index.js",
   "scripts": {
+    "build": "tsc -p .",
     "test": "mocha"
   },
   "repository": {
@@ -20,10 +22,14 @@
   },
   "homepage": "https://github.com/lcnvdl/backzzle-node#readme",
   "devDependencies": {
+    "@types/node": "^14.11.5",
     "chai": "^4.2.0",
-    "mocha": "^8.1.3"
+    "mocha": "^8.1.3",
+    "typescript": "^4.0.3"
   },
   "dependencies": {
+    "@types/amqplib": "^0.5.13",
+    "amqplib": "^0.6.0",
     "emvicify": "git+https://github.com/lcnvdl/emvicify.git",
     "node-essential": "0.0.21"
   }

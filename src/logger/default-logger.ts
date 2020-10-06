@@ -1,6 +1,6 @@
-class DefaultLogger {
+export class DefaultLogger {
     /** @deprecated */
-    log(a, b) {
+    log(a: any, b?: any) {
         if (typeof b !== "undefined") {
             console.log(a, b);
         }
@@ -9,7 +9,7 @@ class DefaultLogger {
         }
     }
 
-    debug(a, b) {
+    debug(a: any, b?: any) {
         if (typeof b !== "undefined") {
             console.log(a, b);
         }
@@ -17,8 +17,8 @@ class DefaultLogger {
             console.log(a);
         }
     }
-    
-    info(a, b) {
+
+    info(a: any, b?: any) {
         if (typeof b !== "undefined") {
             console.log(a, b);
         }
@@ -26,8 +26,8 @@ class DefaultLogger {
             console.log(a);
         }
     }
-    
-    error(a, b) {
+
+    error(a: any, b?: any) {
         if (typeof b !== "undefined") {
             console.error(a, b);
         }
@@ -36,5 +36,3 @@ class DefaultLogger {
         }
     }
 }
-
-module.exports = DefaultLogger;

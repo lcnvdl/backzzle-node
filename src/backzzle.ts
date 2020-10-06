@@ -1,15 +1,20 @@
-/** @typedef {import("node-essential/src/managers/system/injection.manager")} InjectionManager */
+import path from "path";
+import fs from "fs";
+import { DefaultLogger } from "./logger/default-logger";
+import * as amqplib from "amqplib";
 
 const essential = require("node-essential");
 const { start } = require("emvicify");
 
-class Backzzle {
+export class Backzzle {
+    injection: any = null;
+
     constructor() {
         /** @type {InjectionManager} */
         this.injection = new essential.Managers.System.InjectionManager();
 
-        this.injection.add("settings", () => this._loadSettings());
-        this.injection.add("log", () => new (require("./logger/default-logger"))());
+        this.injection.add("settings", () => this.loadSettings());
+        this.injection.add("log", () => new DefaultLogger());
     }
 
     get settings() {
@@ -17,10 +22,10 @@ class Backzzle {
     }
 
     start() {
-        const args = this._prepareMfy();
+        const args = this.prepareMfy();
 
         return new Promise((resolve, reject) => {
-            start(process.cwd(), this.settings.express.port, args).then(dependencies => {
+            start(process.cwd(), this.settings.express.port, args).then((dependencies: any) => {
                 const { modules } = dependencies;
 
                 Object.keys(modules.services).map(k => modules.services[k]).forEach(s => s.injection = this.injection);
@@ -28,13 +33,13 @@ class Backzzle {
                 Object.keys(modules.routers).map(k => modules.routers[k]).forEach(r => r.injection = this.injection);
 
                 resolve();
-            }, err => {
+            }, (err: any) => {
                 reject(err);
             });
         });
     }
 
-    _prepareMfy() {
+    private prepareMfy() {
         const settingsFile = this.settings;
 
         const expressSettings = {
@@ -54,9 +59,8 @@ class Backzzle {
         }
 
         if (settingsFile.amqp.enabled) {
-            const amqp = require("amqplib");
             const amqpSettings = settingsFile.amqp;
-            const rabbitEngine = new Engines.RabbitMQEngine(amqp, amqpSettings);
+            const rabbitEngine = new Engines.RabbitMQEngine(amqplib, amqpSettings);
             engines.push(rabbitEngine);
         }
 
@@ -65,10 +69,9 @@ class Backzzle {
         return args;
     }
 
-    _loadSettings() {
+    private loadSettings() {
         const args = process.argv.slice(2);
         const cwd = process.cwd();
-        const path = require("path");
 
         let settings = "settings.json";
 
@@ -85,19 +88,17 @@ class Backzzle {
 
         // console.log(`Loading settings from ${settings}`);
 
-        let settingsObject = require(path.join(cwd, settings));
+        let settingsObject = JSON.parse(fs.readFileSync(path.join(cwd, settings), "utf8"));
 
         while (settingsObject.$inherit) {
             const parent = settingsObject.$inherit;
             delete settingsObject.$inherit;
             // console.debug(` - Loading parent settings from ${parent}`);
 
-            let parentObject = require(path.join(cwd, parent));
+            let parentObject = JSON.parse(fs.readFileSync(path.join(cwd, parent), "utf8"));
             settingsObject = Object.assign(parentObject, settingsObject);
         }
 
         return settingsObject;
     }
 }
-
-module.exports = Backzzle;
