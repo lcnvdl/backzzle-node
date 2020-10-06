@@ -1,0 +1,6 @@
+*.ts
+*.sh
+src
+
+# include the .d.ts files
+!*.d.ts

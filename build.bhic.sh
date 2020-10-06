@@ -1,0 +1,4 @@
+del lib
+
+tsc -p .
+

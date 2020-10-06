@@ -1,4 +1,6 @@
-export class DefaultLogger {
+import { ILogger } from "./logger.interface";
+
+export class DefaultLogger implements ILogger {
     /** @deprecated */
     log(a: any, b?: any) {
         if (typeof b !== "undefined") {

@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 import { DefaultLogger } from "./logger/default-logger";
 import * as amqplib from "amqplib";
+import { ILogger } from "./logger/logger.interface";
 
 const essential = require("node-essential");
 const { start } = require("emvicify");
@@ -19,6 +20,14 @@ export class Backzzle {
 
     get settings() {
         return this.injection.get("settings");
+    }
+
+    get logger(): ILogger {
+        return this.injection.get("log");
+    }
+
+    set logger(v: ILogger) {
+        this.injection.add("log", () => v);
     }
 
     start() {
