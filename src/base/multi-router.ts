@@ -36,22 +36,28 @@ export class MultiRouter extends AbstractRouter {
      * @abstract
      */
     registerActions() {
-        throw new Error("Abstract method");
+        throw new Error("Abstract method: registerActions");
     }
 
     post(url: string, action: Function, middlewares?: any) {
-        if (this.expressRouter) {
-            this.expressRouter.post(url, action, middlewares);
-        }
+        this.registerAction("post", url, action, middlewares);
+    }
 
-        if (this.amqpRouter) {
-            this.amqpRouter.registerAction(url, action, middlewares);
-        }
+    put(url: string, action: Function, middlewares?: any) {
+        this.registerAction("put", url, action, middlewares);
+    }
+
+    delete(url: string, action: Function, middlewares?: any) {
+        this.registerAction("delete", url, action, middlewares);
     }
 
     get(url: string, action: Function, middlewares?: any) {
+        this.registerAction("get", url, action, middlewares);
+    }
+
+    private registerAction(method: "post" | "put" | "get" | "delete", url: string, action: Function, middlewares?: any) {
         if (this.expressRouter) {
-            this.expressRouter.get(url, action, middlewares);
+            this.expressRouter[method](url, action, middlewares);
         }
 
         if (this.amqpRouter) {
