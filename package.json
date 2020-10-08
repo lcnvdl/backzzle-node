@@ -1,6 +1,6 @@
 {
   "name": "backzzle",
-  "version": " 0.0.7",
+  "version": " 0.0.8",
   "description": "Backzzle",
   "types": "lib",
   "main": "lib/index.js",
@@ -23,14 +23,16 @@
   },
   "homepage": "https://github.com/lcnvdl/backzzle-node#readme",
   "devDependencies": {
+    "@types/amqplib": "^0.5.13",
+    "@types/axios": "^0.14.0",
     "@types/node": "^14.11.5",
     "chai": "^4.2.0",
     "mocha": "^8.1.3",
     "typescript": "^4.0.3"
   },
   "dependencies": {
-    "@types/amqplib": "^0.5.13",
     "amqplib": "^0.6.0",
+    "axios": "^0.20.0",
     "emvicify": "git+https://github.com/lcnvdl/emvicify.git",
     "node-essential": "0.0.22"
   }

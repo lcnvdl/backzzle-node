@@ -1,6 +1,9 @@
 import { ApiRouter } from "./api-router";
 
-export class ApiDocument {
+/**
+ * MicroService.
+ */
+export class ApiService {
     name = "";
     routers: ApiRouter[] = [];
 }

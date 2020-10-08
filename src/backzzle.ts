@@ -1,21 +1,23 @@
 import path from "path";
 import fs from "fs";
-import { DefaultLogger } from "./logger/default-logger";
 import * as amqplib from "amqplib";
+import { DefaultLogger } from "./logger/default-logger";
 import { ILogger } from "./logger/logger.interface";
+import { IInjection } from "./interfaces/injection.interface";
 
 const essential = require("node-essential");
 const { start } = require("emvicify");
 
 export class Backzzle {
-    injection: any = null;
+    injection: IInjection = null;
 
     constructor() {
         /** @type {InjectionManager} */
-        this.injection = new essential.Managers.System.InjectionManager();
+        this.injection = new essential.Managers.System.InjectionManager() as any;
 
         this.injection.add("settings", () => this.loadSettings());
         this.injection.add("log", () => new DefaultLogger());
+        this.injection.add("essential", essential);
     }
 
     get settings() {

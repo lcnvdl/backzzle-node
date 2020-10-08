@@ -1,9 +1,10 @@
-const { AbstractRouter, AmqpRouter, ExpressRouter } = require("emvicify/routers");
+import { AbstractRouter } from "./abstract-router";
 
-export { AbstractRouter };
+const { AmqpRouter, ExpressRouter } = require("emvicify/routers");
 
 export class MultiRouter extends AbstractRouter {
-    amqpRouter;
+    amqpRouter: any;
+    expressRouter: any;
 
     constructor(objects: any) {
         super(objects);
