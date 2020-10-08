@@ -1,11 +1,12 @@
 {
   "name": "backzzle",
-  "version": "0.0.4",
+  "version": " 0.0.7",
   "description": "Backzzle",
   "types": "lib",
   "main": "lib/index.js",
   "scripts": {
     "build": "bhic build.bhic.sh",
+    "deploy": "npm run build && bhic -c node-tools increase-and-publish",
     "test": "mocha"
   },
   "repository": {
