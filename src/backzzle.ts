@@ -4,6 +4,7 @@ import * as amqplib from "amqplib";
 import { DefaultLogger } from "./logger/default-logger";
 import { ILogger } from "./logger/logger.interface";
 import { IInjection } from "./interfaces/injection.interface";
+import { IMfyBaseEngine } from "./interfaces/emvicify/mfy-engine.interface";
 
 const essential = require("node-essential");
 const { start } = require("emvicify");
@@ -50,6 +51,10 @@ export class Backzzle {
         });
     }
 
+    getEngine(name: "amqp" | "rabbitmq" | "express"): IMfyBaseEngine {
+        return this.injection.get(`bz.engines.${name}`);
+    }
+
     private prepareMfy() {
         const settingsFile = this.settings;
 
@@ -67,12 +72,15 @@ export class Backzzle {
         if (settingsFile.express.enabled) {
             const express = new Engines.ExpressEngine(null, settingsFile.express.port, expressSettings);
             engines.push(express);
+            this.injection.add("bz.engines.express", express);
         }
 
         if (settingsFile.amqp.enabled) {
             const amqpSettings = settingsFile.amqp;
             const rabbitEngine = new Engines.RabbitMQEngine(amqplib, amqpSettings);
             engines.push(rabbitEngine);
+            this.injection.add("bz.engines.amqp", rabbitEngine);
+            this.injection.add("bz.engines.rabbitmq", rabbitEngine);
         }
 
         const args = { settingsFile, expressSettings, engines };
