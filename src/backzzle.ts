@@ -81,7 +81,7 @@ export class Backzzle {
 
             const jsonFsIndex = process.argv.slice(2).findIndex(m => m === "--input" || m === "--channel");
             if (jsonFsIndex !== -1) {
-                source.channel = process.argv.slice(2)[jsonFsIndex];
+                source.channel = process.argv.slice(2)[jsonFsIndex + 1];
             }
 
             const jsonFsSettings = settingsFile.jsonFs || {};
