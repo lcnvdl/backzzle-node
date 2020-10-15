@@ -1,6 +1,6 @@
 {
   "name": "backzzle",
-  "version": " 0.0.12",
+  "version": " 0.0.13",
   "description": "Backzzle",
   "types": "lib",
   "main": "lib/index.js",

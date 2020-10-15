@@ -63,7 +63,19 @@ export class MultiRouter extends AbstractRouter {
         }
     }
 
+    private setDefaultRouterSettings(objects: any) {
+        if (!objects.routerSettings) {
+            objects.routerSettings = {};
+        }
+
+        if (typeof objects.routerSettings.printHandledErrors === "undefined") {
+            objects.routerSettings.printHandledErrors = true;
+        }
+    }
+
     private initializeRouters(objects: any) {
+        this.setDefaultRouterSettings(objects);
+
         /** @type {JsonFSRouter} */
         this.jsonFsRouter = null;
 
