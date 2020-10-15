@@ -1,35 +1,28 @@
 import { AbstractRouter } from "./abstract-router";
 
-const { AmqpRouter, ExpressRouter } = require("emvicify/routers");
+const { AmqpRouter, ExpressRouter, JsonFSRouter } = require("emvicify/routers");
 
 export class MultiRouter extends AbstractRouter {
     amqpRouter: any;
     expressRouter: any;
+    jsonFsRouter: any;
 
     constructor(objects: any) {
         super(objects);
-
-        /** @type {AmqpRouter} */
-        this.amqpRouter = null;
-
-        if (this.settings.amqp.enabled) {
-            this.amqpRouter = new AmqpRouter(objects)
-        }
-
-        /** @type {ExpressRouter} */
-        this.expressRouter = null;
-
-        if (this.settings.express.enabled) {
-            this.expressRouter = new ExpressRouter(objects)
-        }
+        this.initializeRouters(objects);
     }
 
     registerEngines(engines: any) {
         if (this.expressRouter) {
             this.expressRouter.registerEngines(engines);
         }
+
         if (this.amqpRouter) {
             this.amqpRouter.registerEngines(engines);
+        }
+
+        if (this.jsonFsRouter) {
+            this.jsonFsRouter.registerEngines(engines);
         }
     }
 
@@ -63,6 +56,33 @@ export class MultiRouter extends AbstractRouter {
 
         if (this.amqpRouter) {
             this.amqpRouter.registerAction(url, action, middlewares);
+        }
+
+        if (this.jsonFsRouter) {
+            this.jsonFsRouter.registerAction(url, action, middlewares);
+        }
+    }
+
+    private initializeRouters(objects: any) {
+        /** @type {JsonFSRouter} */
+        this.jsonFsRouter = null;
+
+        if (this.settings.jsonFs && this.settings.jsonFs.enabled) {
+            this.jsonFsRouter = new JsonFSRouter(objects)
+        }
+
+        /** @type {AmqpRouter} */
+        this.amqpRouter = null;
+
+        if (this.settings.amqp && this.settings.amqp.enabled) {
+            this.amqpRouter = new AmqpRouter(objects)
+        }
+
+        /** @type {ExpressRouter} */
+        this.expressRouter = null;
+
+        if (this.settings.express && this.settings.express.enabled) {
+            this.expressRouter = new ExpressRouter(objects)
         }
     }
 }
