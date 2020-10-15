@@ -1,11 +1,12 @@
 import { AbstractRouter } from "./abstract-router";
 
-const { AmqpRouter, ExpressRouter, JsonFSRouter } = require("emvicify/routers");
+const { AmqpRouter, ExpressRouter, JsonFSRouter, JsonArgsRouter } = require("emvicify/routers");
 
 export class MultiRouter extends AbstractRouter {
     amqpRouter: any;
     expressRouter: any;
     jsonFsRouter: any;
+    jsonArgsRouter: any;
 
     constructor(objects: any) {
         super(objects);
@@ -23,6 +24,10 @@ export class MultiRouter extends AbstractRouter {
 
         if (this.jsonFsRouter) {
             this.jsonFsRouter.registerEngines(engines);
+        }
+
+        if (this.jsonArgsRouter) {
+            this.jsonArgsRouter.registerEngines(engines);
         }
     }
 
@@ -61,6 +66,10 @@ export class MultiRouter extends AbstractRouter {
         if (this.jsonFsRouter) {
             this.jsonFsRouter.registerAction(url, action, middlewares);
         }
+
+        if (this.jsonArgsRouter) {
+            this.jsonArgsRouter.registerAction(url, action, middlewares);
+        }
     }
 
     private setDefaultRouterSettings(objects: any) {
@@ -81,6 +90,13 @@ export class MultiRouter extends AbstractRouter {
 
         if (this.settings.jsonFs && this.settings.jsonFs.enabled) {
             this.jsonFsRouter = new JsonFSRouter(objects)
+        }
+
+        /** @type {JsonArgsRouter} */
+        this.jsonArgsRouter = null;
+
+        if (this.settings.jsonArgs && this.settings.jsonArgs.enabled) {
+            this.jsonArgsRouter = new JsonArgsRouter(objects)
         }
 
         /** @type {AmqpRouter} */

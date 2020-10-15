@@ -8,7 +8,10 @@ import { IMfyBaseEngine } from "./interfaces/emvicify/mfy-engine.interface";
 import { IMfyModules } from "./interfaces/emvicify/mfy-modules.interface";
 
 const essential = require("node-essential");
-const { start } = require("emvicify");
+const mfy = require("emvicify");
+
+const start = mfy.start;
+const Engines = mfy.engines;
 
 export class Backzzle {
     injection: IInjection = null;
@@ -58,7 +61,7 @@ export class Backzzle {
         });
     }
 
-    getEngine(name: "amqp" | "rabbitmq" | "express" | "jsonfs"): IMfyBaseEngine {
+    getEngine(name: "amqp" | "rabbitmq" | "express" | "jsonfs" | "jsonargs"): IMfyBaseEngine {
         return this.injection.get(`bz.engines.${name}`);
     }
 
@@ -72,9 +75,55 @@ export class Backzzle {
             cors: settingsFile.express.cors
         };
 
-        const Engines = require("emvicify").engines;
+        const engines = [
+            this.startExpressEngine(settingsFile, expressSettings),
+            this.startJsonFsEngine(settingsFile),
+            this.startJsonArgsEngine(settingsFile),
+            this.startAmqpEngine(settingsFile),
+        ].filter(m => m);
 
-        const engines = [];
+        const args = { settingsFile, expressSettings, engines };
+
+        return args;
+    }
+
+    private startExpressEngine(settingsFile: any, expressSettings: any) {
+        if (settingsFile.express.enabled) {
+            const express = new Engines.ExpressEngine(null, settingsFile.express.port, expressSettings);
+            this.injection.add("bz.engines.express", express);
+            return express;
+        }
+
+        return null;
+    }
+
+    private startAmqpEngine(settingsFile: any) {
+        if (settingsFile.amqp && settingsFile.amqp.enabled) {
+            const amqpSettings = settingsFile.amqp;
+            const rabbitEngine = new Engines.RabbitMQEngine(amqplib, amqpSettings);
+            this.injection.add("bz.engines.amqp", rabbitEngine);
+            this.injection.add("bz.engines.rabbitmq", rabbitEngine);
+            return rabbitEngine;
+        }
+
+        return null;
+    }
+
+    private startJsonArgsEngine(settingsFile:any) {
+        let jsonArgs = null;
+
+        if (settingsFile.jsonArgs && settingsFile.jsonArgs.enabled) {
+            const source = {};
+            const jsonArgsSettings = settingsFile.jsonArgs || {};
+            jsonArgs = new Engines.JsonArgsEngine(source, jsonArgsSettings);
+            this.injection.add("bz.engines.jsonargs", jsonArgs);
+        }
+
+        return jsonArgs;
+    }
+
+    private startJsonFsEngine(settingsFile: any) {
+        let jsonFs = null;
 
         if (settingsFile.jsonFs && settingsFile.jsonFs.enabled) {
             const source = { channel: "backzzle" };
@@ -85,28 +134,11 @@ export class Backzzle {
             }
 
             const jsonFsSettings = settingsFile.jsonFs || {};
-            const jsonFs = new Engines.JsonFSEngine(source, jsonFsSettings);
-            engines.push(jsonFs);
+            jsonFs = new Engines.JsonFSEngine(source, jsonFsSettings);
             this.injection.add("bz.engines.jsonfs", jsonFs);
         }
 
-        if (settingsFile.express.enabled) {
-            const express = new Engines.ExpressEngine(null, settingsFile.express.port, expressSettings);
-            engines.push(express);
-            this.injection.add("bz.engines.express", express);
-        }
-
-        if (settingsFile.amqp && settingsFile.amqp.enabled) {
-            const amqpSettings = settingsFile.amqp;
-            const rabbitEngine = new Engines.RabbitMQEngine(amqplib, amqpSettings);
-            engines.push(rabbitEngine);
-            this.injection.add("bz.engines.amqp", rabbitEngine);
-            this.injection.add("bz.engines.rabbitmq", rabbitEngine);
-        }
-
-        const args = { settingsFile, expressSettings, engines };
-
-        return args;
+        return jsonFs;
     }
 
     private loadSettings() {
