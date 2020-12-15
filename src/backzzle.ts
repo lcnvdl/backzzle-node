@@ -6,6 +6,7 @@ import { ILogger } from "./logger/logger.interface";
 import { IInjection } from "./interfaces/injection.interface";
 import { IMfyBaseEngine } from "./interfaces/emvicify/mfy-engine.interface";
 import { IMfyModules } from "./interfaces/emvicify/mfy-modules.interface";
+import { IBackzzleInitializationSettings } from "./interfaces/backzzle-initialization-settings.interface";
 
 const essential = require("node-essential");
 const mfy = require("emvicify");
@@ -14,15 +15,26 @@ const start = mfy.start;
 const Engines = mfy.engines;
 
 export class Backzzle {
+    private defaultSettings: string = null;
+    private parseArgs = true;
+
     injection: IInjection = null;
 
-    constructor() {
+    constructor(initializationSettings?: IBackzzleInitializationSettings) {
         /** @type {InjectionManager} */
         this.injection = new essential.Managers.System.InjectionManager() as any;
 
         this.injection.add("settings", () => this.loadSettings());
         this.injection.add("log", () => new DefaultLogger());
         this.injection.add("essential", essential);
+
+        if (initializationSettings) {
+            this.defaultSettings = initializationSettings.defaultSettingsFile;
+
+            if (initializationSettings.parseArgs === false) {
+                this.parseArgs = false;
+            }
+        }
     }
 
     get settings() {
@@ -44,7 +56,7 @@ export class Backzzle {
     start() {
         const args = this.prepareMfy();
 
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             start(process.cwd(), this.settings.express.port, args).then((dependencies: any) => {
                 const { modules } = dependencies;
 
@@ -109,7 +121,7 @@ export class Backzzle {
         return null;
     }
 
-    private startJsonArgsEngine(settingsFile:any) {
+    private startJsonArgsEngine(settingsFile: any) {
         let jsonArgs = null;
 
         if (settingsFile.jsonArgs && settingsFile.jsonArgs.enabled) {
@@ -142,19 +154,22 @@ export class Backzzle {
     }
 
     private loadSettings() {
-        const args = process.argv.slice(2);
+        let settings = this.defaultSettings || "settings.json";
+
         const cwd = process.cwd();
 
-        let settings = "settings.json";
+        if (this.parseArgs) {
+            const args = process.argv.slice(2);
 
-        for (let i = 0; i < args.length; i++) {
-            const a = args[i];
+            for (let i = 0; i < args.length; i++) {
+                const a = args[i];
 
-            if (a.indexOf(".json") !== -1) {
-                settings = a;
-            }
-            else if (a == "-s" || a === "--settings") {
-                settings = args[++i];
+                if (a.indexOf(".json") !== -1) {
+                    settings = a;
+                }
+                else if (a == "-s" || a === "--settings") {
+                    settings = args[++i];
+                }
             }
         }
 
